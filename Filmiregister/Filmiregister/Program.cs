@@ -11,7 +11,7 @@ namespace Filmiregister
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<FilmContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
+            builder.Services.AddDbContext<MovieContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
