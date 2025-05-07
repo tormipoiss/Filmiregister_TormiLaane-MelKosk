@@ -14,6 +14,7 @@ namespace Filmiregister.Models
         public List<string> Categories { get; set; }
         public DateOnly PublicationDate { get; set; }
         public string MovieLanguage { get; set; }
+        public TimeOnly Duration { get; set; }
         //public List<Account> UsersWhoOwnMovie { get; set; }
         //public List<Comment> CommentsOnMovie { get; set; }
     }
