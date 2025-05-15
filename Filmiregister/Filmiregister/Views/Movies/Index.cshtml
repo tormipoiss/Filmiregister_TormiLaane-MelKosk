@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Filmiregister.Models.Movie>
+
+<div class="h1">List of all movies</div>
+
+<!-- Add some custom CSS for the images -->
+<style>
+    .movie-poster {
+        width: 120px; /* Increased from 50px */
+        height: auto;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .movie-poster:hover {
+        transform: scale(1.5); /* Optional: adds a zoom effect on hover */
+        z-index: 100;
+        position: relative;
+    }
+
+    /* Make the image column wider */
+    #moviesTable th:first-child,
+    #moviesTable td:first-child {
+        min-width: 130px;
+        text-align: center;
+    }
+</style>
+
+<table id="moviesTable" class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Image</th>
+            <th scope="col">Title</th>
+            <th scope="col">Rating</th>
+            <th scope="col">Language</th>
+            <th scope="col">Publication date</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td><img src="@movie.Image" alt="@movie.Title" class="movie-poster" /></td>
+                <td>@movie.Title</td>
+                <td>@movie.Rating</td>
+                <td>@movie.Language</td>
+                <td>@movie.PublicationDate.ToShortDateString()</td>
+                <td>@movie.Duration</td>
+                <td>
+                    <a asp-action="details" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="update" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-warning btn-sm">Update</a>
+                    <a asp-action="delete" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#moviesTable').DataTable({
+                "searching": false,  // Disable search functionality
+                "pageLength": 10,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                "order": [[ 1, "asc" ]], // Sort by title (column index 1)
+                "columnDefs": [
+                    { "orderable": false, "targets": 0 } // Make the image column non-sortable
+                ]
+            });
+        });
+    </script>
+}

@@ -1,4 +1,4 @@
-using Filmiregister.DatabaseContext;
+﻿using Filmiregister.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,7 +6,7 @@ namespace Filmiregister
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +15,7 @@ namespace Filmiregister
             builder.Services.AddDbContext<MovieContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             var app = builder.Build();
-            CreateDbIfNotExists(app);
+            await CreateDbIfNotExists(app);
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -38,7 +38,7 @@ namespace Filmiregister
 
             app.Run();
         }
-        private static void CreateDbIfNotExists(IHost host)
+        private async static Task CreateDbIfNotExists(IHost host)
         {
             using (var scope = host.Services.CreateScope())
             {
@@ -46,7 +46,7 @@ namespace Filmiregister
                 try
                 {
                     var context = services.GetRequiredService<MovieContext>();
-                    DbInitializer.Initialize(context);
+                    await DbInitializer.Initialize(context);
                 }
                 catch (Exception ex)
                 {

@@ -7,6 +7,8 @@ namespace Filmiregister.DatabaseContext
     {
         public MovieContext(DbContextOptions<MovieContext> options) : base(options) { }
         public DbSet<Movie> Movies { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Account> Accounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
