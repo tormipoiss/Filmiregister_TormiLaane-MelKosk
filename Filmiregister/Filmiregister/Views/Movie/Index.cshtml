@@ -1,0 +1,50 @@
+﻿@model Filmiregister.Models.Movie
+@{
+    ViewData["Title"] = Model.MovieTitle;
+}
+@* inspiration https://www.themoviedb.org/tv/60735-the-flash *@
+<div class="container-fluid py-5" style="position: relative; overflow: hidden; min-height: 700px; color: white;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('@Model.MovieSecondImage'); background-size: cover; background-position: center; filter: blur(5px); z-index: -1;"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="@Model.MovieImage" class="img-fluid rounded shadow-lg mb-4">
+            </div>
+            <div class="col-md-8">
+                <h1 class="display-4 mb-3">@Model.MovieTitle (@Model.PublicationDate.ToString("yyyy"))</h1>
+                <div class="mb-4">
+                    <h2 class="text-warning">Description</h2>
+                    <p class="lead">@Model.MovieDescription</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="text-warning">Rating</h2>
+                        <p class="lead">@Model.MovieRating / 5</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="text-warning">Language</h2>
+                        <p class="lead">@Model.MovieLanguage</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="text-warning">Duration</h2>
+                        <p class="lead">@Model.Duration</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h2 class="text-warning">Categories</h2>
+                    <ul class="list-unstyled">
+                        @foreach (var category in Model.Categories)
+                        {
+                            <li class="badge bg-secondary text-white p-2 me-2 mb-2">@category</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
