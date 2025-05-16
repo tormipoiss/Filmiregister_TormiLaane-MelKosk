@@ -19,5 +19,17 @@ namespace Filmiregister.Controllers
 
             return View(movies);
         }
+
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return RedirectToAction("Index", "Home");
+
+            var movie = _context.Movies.FirstOrDefault(m => m.ID == id);
+
+            if (movie == null) return RedirectToAction("Index", "Home");
+
+            return View(movie);
+        }
     }
 }
