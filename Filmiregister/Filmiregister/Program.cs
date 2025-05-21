@@ -1,4 +1,8 @@
 ﻿using Filmiregister.DatabaseContext;
+using Filmiregister.Models;
+using Filmiregister.ServiceInterface;
+using Filmiregister.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,8 +16,30 @@ namespace Filmiregister
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IEmailsServices, EmailsServices>();
+
             builder.Services.AddDbContext<MovieContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequiredLength = 3;
+
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            })
+    .AddEntityFrameworkStores<MovieContext>()
+    .AddDefaultTokenProviders()
+    .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("CustomEmailConfirmation")
+    .AddDefaultUI();
+
+            //all tokens
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(
+                options => options.TokenLifespan = TimeSpan.FromHours(5)
+                );
+
             var app = builder.Build();
             await CreateDbIfNotExists(app);
 
