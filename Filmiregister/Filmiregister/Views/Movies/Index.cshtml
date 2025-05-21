@@ -64,6 +64,7 @@
     <script>
         $(document).ready(function() {
             $('#moviesTable').DataTable({
+                "searching": false,
                 "pageLength": 10,
                 "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
                 "order": [[ 1, "asc" ]], // Sort by title (column index 1)
