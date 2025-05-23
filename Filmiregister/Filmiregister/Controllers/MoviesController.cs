@@ -15,7 +15,15 @@ namespace Filmiregister.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var movies = _context.Movies.OrderByDescending(y => y.Rating).ToList();
+            List<Models.Movie> movies;
+            try
+            {
+                movies = _context.Movies.OrderByDescending(y => y.Rating).ToList();
+            }
+            catch
+            {
+                movies = new List<Models.Movie>();
+            }
 
             return View(movies);
         }

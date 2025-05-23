@@ -41,7 +41,7 @@ namespace Filmiregister
                 );
 
             var app = builder.Build();
-            await CreateDbIfNotExists(app);
+            CreateDbIfNotExists(app);
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -72,6 +72,7 @@ namespace Filmiregister
                 try
                 {
                     var context = services.GetRequiredService<MovieContext>();
+                    context.Database.EnsureCreated();
                     await DbInitializer.Initialize(context);
                 }
                 catch (Exception ex)

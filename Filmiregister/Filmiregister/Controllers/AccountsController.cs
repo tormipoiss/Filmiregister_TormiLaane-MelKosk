@@ -11,14 +11,14 @@ namespace Filmiregister.Controllers
     public class AccountsController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        //private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailsServices _emailsServices;
 
-        public AccountsController(UserManager<ApplicationUser> userManager, IEmailsServices emailsServices/*, SignInManager<ApplicationUser> signInManager*/)
+        public AccountsController(UserManager<ApplicationUser> userManager, IEmailsServices emailsServices, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _emailsServices = emailsServices;
-            //_signInManager = signInManager;
+            _signInManager = signInManager;
         }
         [HttpGet]
         public IActionResult Register()
@@ -136,5 +136,47 @@ namespace Filmiregister.Controllers
         //{
         //    return View();
         //}
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Login()
+        {
+
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(Login model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(model.UserName);
+                if (user == null) return RedirectToAction("Index", "Home");
+                if (user != null && !user.EmailConfirmed)
+                {
+                    ViewBag.ErrorTile = "Confirm Email";
+                    ViewBag.ErrorMessage = "Your email is not confirmed yet. Please confirm it.";
+                    return View("Error");
+                }
+                var check = await _userManager.CheckPasswordAsync(user, model.Password);
+                if (!check)
+                {
+                    ViewBag.ErrorTile = "Invalid login";
+                    ViewBag.ErrorMessage = "Email or password is incorrect";
+                    return View("Error");
+                }
+                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                ViewBag.ErrorTile = "Invalid login";
+                ViewBag.ErrorMessage = "Email or password is incorrect";
+                return View("Error");
+            }
+            return View(model);
+        }
+
+
     }
 }
