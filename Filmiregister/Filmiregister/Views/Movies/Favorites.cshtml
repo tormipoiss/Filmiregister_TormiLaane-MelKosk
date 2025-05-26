@@ -1,29 +1,27 @@
 ﻿@model IEnumerable<Filmiregister.Models.Movie>
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<Filmiregister.Models.ApplicationUser> signInManager
-<div class="h1">List of all movies</div>
+<div class="h1">Your favorited movies</div>
 
 <!-- Add some custom CSS for the images -->
 <style>
     .movie-poster {
-    width: 120px; /* Increased from 50px */
-    height: auto;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
+        width: 120px; /* Increased from 50px */
+        height: auto;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
     }
 
-    .movie-poster:hover {
-    transform: scale(1.5); /* Optional: adds a zoom effect on hover */
-    z-index: 100;
-    position: relative;
-    }
+        .movie-poster:hover {
+            transform: scale(1.5); /* Optional: adds a zoom effect on hover */
+            z-index: 100;
+            position: relative;
+        }
 
     /* Make the image column wider */
     #moviesTable th:first-child,
     #moviesTable td:first-child {
-    min-width: 130px;
-    text-align: center;
+        min-width: 130px;
+        text-align: center;
     }
 </style>
 
@@ -53,16 +51,6 @@
                     <a asp-action="details" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-info btn-sm">Details</a>
                     <a asp-action="update" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-warning btn-sm">Update</a>
                     <a asp-action="delete" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-danger btn-sm">Delete</a>
-                    @if (signInManager.IsSignedIn(User))
-                    {
-                        <form method="post" asp-controller="movies" asp-action="favorite">
-                            <input class="form-control" name = "id" hidden="true" value="@movie.ID"/>
-                            <input class="form-control" name = "username" hidden="true" value="@User.Identity.Name" />
-                            <button type="submit" class="btn btn-primary btn-sm">
-                                Add to favorites
-                            </button>
-                        </form>
-                    }
                 </td>
             </tr>
         }
