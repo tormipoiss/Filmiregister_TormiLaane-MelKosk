@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Filmiregister.Migrations
 {
     /// <inheritdoc />
-    public partial class newmig : Migration
+    public partial class gingus : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,11 +58,11 @@ namespace Filmiregister.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CommentorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    MovieRating = table.Column<int>(type: "int", nullable: false),
-                    MovieID = table.Column<int>(type: "int", nullable: false)
+                    MovieID = table.Column<int>(type: "int", nullable: false),
+                    CommentorName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

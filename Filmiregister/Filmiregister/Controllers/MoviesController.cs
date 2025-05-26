@@ -1,4 +1,5 @@
 ﻿using Filmiregister.DatabaseContext;
+using Filmiregister.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,11 +34,22 @@ namespace Filmiregister.Controllers
         {
             if (id == null) return RedirectToAction("Index", "Home");
 
-            var movie = _context.Movies.FirstOrDefault(m => m.ID == id);
-
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.ID == id);
             if (movie == null) return RedirectToAction("Index", "Home");
 
-            return View(movie);
+            // Get comments directly from context
+            var comments = await _context.Comments
+                .Where(c => c.MovieID == movie.ID)
+                .OrderByDescending(c => c.CreationDate)
+                .ToListAsync();
+
+            var viewModel = new MovieDetails
+            {
+                Movie = movie,
+                Comments = comments
+            };
+
+            return View(viewModel);
         }
     }
 }

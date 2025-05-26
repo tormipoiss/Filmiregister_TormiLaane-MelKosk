@@ -103,7 +103,8 @@ namespace Filmiregister.Migrations
 
                     b.Property<string>("CommentorName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -111,12 +112,13 @@ namespace Filmiregister.Migrations
                     b.Property<int>("MovieID")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieRating")
+                    b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("ID");
 
