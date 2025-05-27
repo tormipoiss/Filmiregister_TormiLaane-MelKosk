@@ -1,44 +1,46 @@
-﻿@model Filmiregister.Models.Movie
+﻿@model Filmiregister.ViewModels.MovieDetails
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Filmiregister.Models.ApplicationUser> signInManager
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model.Movie.Title;
 }
 @* inspiration https://www.themoviedb.org/tv/60735-the-flash *@
 <div class="container-fluid py-5" style="position: relative; overflow: hidden; min-height: 700px; color: white;">
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('@Model.SecondImage'); background-size: cover; background-position: center; filter: blur(5px); z-index: -1;"></div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('@Model.Movie.SecondImage'); background-size: cover; background-position: center; filter: blur(5px); z-index: -1;"></div>
     <div class="container">
         <div class="row">
             <div class="col-md-4">
-                <img src="@Model.Image" class="img-fluid rounded shadow-lg mb-4">
+                <img src="@Model.Movie.Image" class="img-fluid rounded shadow-lg mb-4">
             </div>
             <div class="col-md-8">
-                <h1 class="display-4 mb-3">@Model.Title (@Model.PublicationDate.ToString("yyyy"))</h1>
+                <h1 class="display-4 mb-3">@Model.Movie.Title (@Model.Movie.PublicationDate.ToString("yyyy"))</h1>
                 <div class="mb-4">
                     <h2 class="text-warning">Description</h2>
-                    <p class="lead">@Model.Description</p>
+                    <p class="lead">@Model.Movie.Description</p>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <h2 class="text-warning">Rating</h2>
-                        <p class="lead">@Model.Rating / 10</p>
+                        <p class="lead">@Model.Movie.Rating / 10</p>
                     </div>
                     <div class="col-md-6">
                         <h2 class="text-warning">Language</h2>
-                        <p class="lead">@Model.Language</p>
+                        <p class="lead">@Model.Movie.Language</p>
                     </div>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <h2 class="text-warning">Duration</h2>
-                        <p class="lead">@Model.Duration</p>
+                        <p class="lead">@Model.Movie.Duration</p>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <h2 class="text-warning">Categories</h2>
                     <ul class="list-unstyled">
-                        @foreach (var category in Model.Categories)
+                        @foreach (var category in Model.Movie.Categories)
                         {
                             <li class="badge bg-secondary text-white p-2 me-2 mb-2">@category</li>
                         }
@@ -46,5 +48,115 @@
                 </div>
             </div>
         </div>
+
+        <!-- Comments Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-warning">Comments (@Model.Comments.Count)</h2>
+                    @if (signInManager.IsSignedIn(User))
+                    {
+                        <a href="@Url.Action("AddComment", "Comments", new { movieId = Model.Movie.ID })" 
+                           class="btn btn-warning">
+                            <i class="fas fa-plus"></i> Add Comment
+                        </a>
+                    }
+                </div>
+
+                @if (Model.Comments.Any())
+                {
+                    <!-- First 3 comments (always visible) -->
+                    <div id="initial-comments">
+                        @for (int i = 0; i < Math.Min(3, Model.Comments.Count); i++)
+                        {
+                            var comment = Model.Comments[i];
+                            <div class="card mb-3 bg-dark text-white border-secondary">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="card-title text-warning mb-0">@comment.CommentorName</h6>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-warning text-dark me-2">
+                                                        <i class="fas fa-star"></i> @comment.Rating/10
+                                                    </span>
+                                                    <small class="text-muted">@comment.CreationDate.ToString("MMM dd, yyyy")</small>
+                                                </div>
+                                            </div>
+                                            <p class="card-text">@comment.Text</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Additional comments (hidden by default) -->
+                    @if (Model.Comments.Count > 3)
+                    {
+                        <div id="additional-comments" style="display: none;">
+                            @for (int i = 3; i < Model.Comments.Count; i++)
+                            {
+                                var comment = Model.Comments[i];
+                                <div class="card mb-3 bg-dark text-white border-secondary">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <h6 class="card-title text-warning mb-0">@comment.CommentorName</h6>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge bg-warning text-dark me-2">
+                                                            <i class="fas fa-star"></i> @comment.Rating/10
+                                                        </span>
+                                                        <small class="text-muted">@comment.CreationDate.ToString("MMM dd, yyyy")</small>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text">@comment.Text</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- View More/Less Button -->
+                        <div class="text-center mt-3">
+                            <button id="toggle-comments" class="btn btn-outline-warning">
+                                View More (@(Model.Comments.Count - 3) more comments)
+                            </button>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <p class="text-muted">No comments yet.</p>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- JavaScript for toggle functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.getElementById('toggle-comments');
+    const additionalComments = document.getElementById('additional-comments');
+    let isExpanded = false;
+
+    if (toggleButton) {
+        toggleButton.addEventListener('click', function() {
+            if (isExpanded) {
+                additionalComments.style.display = 'none';
+                toggleButton.textContent = 'View More (@(Model.Comments.Count - 3) more comments)';
+                isExpanded = false;
+            } else {
+                additionalComments.style.display = 'block';
+                toggleButton.textContent = 'View Less';
+                isExpanded = true;
+            }
+        });
+    }
+});
+</script>

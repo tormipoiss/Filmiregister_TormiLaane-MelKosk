@@ -1,0 +1,104 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model Filmiregister.Models.Comment
+@inject SignInManager<Filmiregister.Models.ApplicationUser> signInManager
+@{
+    ViewData["Title"] = "Add Comment";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h2 class="text-warning mb-0">
+                        <i class="fas fa-comment"></i> Add Your Comment
+                    </h2>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("AddComment", "Comments", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="MovieID" value="@ViewBag.MovieID" />
+                        
+                        <div class="mb-3">
+                            <input type="hidden" name="CommentorName" value="@User.Identity.Name" />
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Rating, "Your Rating", new { @class = "form-label text-warning" })
+                            <div class="input-group">
+                                @Html.DropDownListFor(model => model.Rating, 
+                                    new SelectList(Enumerable.Range(1, 10).Select(x => new { Value = x, Text = x + "/10" }), "Value", "Text"),
+                                    "Select Rating", 
+                                    new { @class = "form-select bg-secondary text-white border-warning", required = "required" })
+                                <span class="input-group-text bg-warning text-dark">
+                                    <i class="fas fa-star"></i>
+                                </span>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Rating, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-4">
+                            @Html.LabelFor(model => model.Text, "Your Comment", new { @class = "form-label text-warning" })
+                            @Html.TextAreaFor(model => model.Text, new { 
+                                @class = "form-control bg-secondary text-white border-warning", 
+                                rows = "5",
+                                placeholder = "Share your thoughts about this movie...",
+                                required = "required"
+                            })
+                            @Html.ValidationMessageFor(model => model.Text, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Details", "Movies", new { id = ViewBag.MovieID })" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Movie
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-paper-plane"></i> Submit Comment
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Client-side validation *@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bootstrap validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+});
+</script>
+
+<style>
+.form-control:focus, .form-select:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+.card {
+    border: 1px solid #ffc107;
+}
+
+.was-validated .form-control:valid,
+.was-validated .form-select:valid {
+    border-color: #28a745;
+}
+
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+    border-color: #dc3545;
+}
+</style>
