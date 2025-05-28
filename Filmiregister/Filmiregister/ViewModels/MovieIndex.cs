@@ -2,10 +2,9 @@
 
 namespace Filmiregister.ViewModels
 {
-    public class MovieDetails
+    public class MovieIndex
     {
-        public Movie Movie { get; set; }
-        public List<Comment> Comments { get; set; }
+        public List<Movie> Movies { get; set; } = [];
         public bool IsAdmin { get; set; }
     }
 }

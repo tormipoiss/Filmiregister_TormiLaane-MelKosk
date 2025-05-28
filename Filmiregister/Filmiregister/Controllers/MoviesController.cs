@@ -1,18 +1,25 @@
 ﻿using Filmiregister.DatabaseContext;
 using Filmiregister.Models;
+using Filmiregister.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Xml.Linq;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace Filmiregister.Controllers
 {
     public class MoviesController : Controller
     {
         private readonly MovieContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public MoviesController(MovieContext context)
+        public MoviesController(MovieContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         [HttpGet]
         public IActionResult Index()
@@ -27,7 +34,25 @@ namespace Filmiregister.Controllers
                 movies = new List<Models.Movie>();
             }
 
-            return View(movies);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isAdmin = false;
+            if (userId != null)
+            {
+                var user = _userManager.Users.FirstOrDefault(u => u.Id == userId);
+                if (user != null && user.IsAdmin)
+                {
+                    isAdmin = true; // Only true if user.IsAdmin is true!
+                }
+            }
+
+
+            var viewModel = new MovieIndex
+            {
+                Movies = movies,
+                IsAdmin = isAdmin
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet("Details/{id}")]
@@ -44,10 +69,23 @@ namespace Filmiregister.Controllers
                 .OrderByDescending(c => c.CreationDate)
                 .ToListAsync();
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            bool isAdmin = false;
+            if (userId != null)
+            {
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (user != null && user.IsAdmin)
+                {
+                    isAdmin = true; // Only true if user.IsAdmin is true!
+                }
+            }
+
+
             var viewModel = new MovieDetails
             {
                 Movie = movie,
-                Comments = comments
+                Comments = comments,
+                IsAdmin = isAdmin
             };
 
             return View(viewModel);
@@ -82,5 +120,69 @@ namespace Filmiregister.Controllers
 
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit(int id)
+        {
+            // Get current user ID
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            // Fetch the user from the database
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null || !user.IsAdmin)
+            {
+                return Forbid(); // Not an admin
+            }
+
+            var movie = await _context.Movies.FindAsync(id);
+            if (movie == null)
+                return NotFound();
+
+            return View(movie);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Edit(int id, Movie movie)
+        {
+            // Get current user ID
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            // Fetch the user from the database
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null || !user.IsAdmin)
+            {
+                return Forbid(); // Not an admin
+            }
+
+            if (id != movie.ID)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return View(movie);
+
+            try
+            {
+                _context.Update(movie);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Movies.Any(m => m.ID == id))
+                    return NotFound();
+                else
+                    throw;
+            }
+        }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Filmiregister.Migrations
 {
     [DbContext(typeof(MovieContext))]
-    [Migration("20250526095800_gingus")]
-    partial class gingus
+    [Migration("20250527111102_asd")]
+    partial class asd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Filmiregister.Models
 {
@@ -17,5 +18,15 @@ namespace Filmiregister.Models
         public TimeSpan Duration { get; set; }
         //public List<Account>? AccountsWhoOwnMovie { get; set; }
         //public List<Comment>? CommentsOnMovie { get; set; }
+
+        // Helper property for form binding
+        [NotMapped] // This won't be stored in the database
+        public string CategoriesString
+        {
+            get => Categories != null ? string.Join(", ", Categories) : string.Empty;
+            set => Categories = value?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                     .Select(c => c.Trim())
+                                     .ToList() ?? new List<string>();
+        }
     }
 }

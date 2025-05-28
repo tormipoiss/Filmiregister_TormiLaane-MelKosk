@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Filmiregister.Models.Movie>
+﻿@model Filmiregister.ViewModels.MovieIndex
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<Filmiregister.Models.ApplicationUser> signInManager
 <div class="h1">List of all movies</div>
@@ -40,7 +40,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var movie in Model)
+        @foreach (var movie in Model.Movies)
         {
             <tr>
                 <td><img src="@movie.Image" alt="@movie.Title" class="movie-poster" /></td>
@@ -51,7 +51,6 @@
                 <td>@movie.Duration</td>
                 <td>
                     <a asp-action="details" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-info btn-sm">Details</a>
-                    <a asp-action="update" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-warning btn-sm">Update</a>
                     <a asp-action="delete" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-danger btn-sm">Delete</a>
                     @if (signInManager.IsSignedIn(User))
                     {
@@ -62,6 +61,10 @@
                                 Add to favorites
                             </button>
                         </form>
+                        if (Model.IsAdmin)
+                        {
+                            <a asp-action="edit" asp-controller="movies" asp-route-id="@movie.ID" class="btn btn-warning btn-sm">Edit</a>
+                        }
                     }
                 </td>
             </tr>

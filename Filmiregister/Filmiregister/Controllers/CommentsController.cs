@@ -3,18 +3,19 @@ using Filmiregister.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Filmiregister.Controllers
 {
     public class CommentsController : Controller
     {
         private readonly MovieContext _context;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CommentsController(MovieContext context, SignInManager<ApplicationUser> signInManager)
+        public CommentsController(MovieContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
-            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -55,6 +56,37 @@ namespace Filmiregister.Controllers
             ViewBag.MovieTitle = movie?.Title;
 
             return View(comment);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> DeleteComment(int ID)
+        {
+            // Get current user ID
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            // Fetch the user from the database
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null || !user.IsAdmin)
+            {
+                return Forbid(); // Not an admin
+            }
+
+            var comment = await _context.Comments.FirstOrDefaultAsync(c => c.ID == ID);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", "Movies", new { id = comment.MovieID });
         }
     }
 }
