@@ -48,6 +48,15 @@
                 </div>
             </div>
         </div>
+        @if (Model.IsAdmin)
+        {
+            <form method="post" asp-controller="movies" asp-action="delete">
+                <input class="form-control" name="id" hidden="true" value="@Model.Movie.ID" />
+                <button type="submit" class="btn btn-danger btn-sm">
+                    Delete this movie
+                </button>
+            </form>
+        }
 
         <!-- Comments Section -->
         <div class="row mt-5">

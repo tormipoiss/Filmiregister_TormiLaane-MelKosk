@@ -184,5 +184,24 @@ namespace Filmiregister.Controllers
                     throw;
             }
         }
+        public async Task<IActionResult> Delete(int Id)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null || !user.IsAdmin)
+            {
+                return Forbid(); // Not an admin
+            }
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.ID == Id);
+            if(movie == null) return NotFound();
+            _context.Movies.Remove(movie);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
+        }
     }
 }
