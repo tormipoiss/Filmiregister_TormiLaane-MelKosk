@@ -26,7 +26,10 @@
     text-align: center;
     }
 </style>
-
+@if (Model.IsAdmin)
+{
+    <a asp-action="create" asp-controller="movies" class="btn btn-primary btn-sm">Add a new movie to database</a>
+}
 <table id="moviesTable" class="table table-hover">
     <thead>
         <tr>
